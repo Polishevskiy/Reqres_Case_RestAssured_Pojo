@@ -1,4 +1,4 @@
-package registration;
+package pojos;
 
 public class Register {
     private String email;

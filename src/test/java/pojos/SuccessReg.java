@@ -1,4 +1,4 @@
-package registration;
+package pojos;
 
 public class SuccessReg {
     private Integer id;

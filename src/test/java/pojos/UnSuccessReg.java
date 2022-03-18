@@ -1,4 +1,4 @@
-package registration;
+package pojos;
 
 public class UnSuccessReg {
     private String error;

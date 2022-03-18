@@ -1,4 +1,4 @@
-package colors;
+package pojos;
 
 public class ColorsData {
     private Integer id;

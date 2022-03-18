@@ -1,20 +1,27 @@
-import colors.ColorsData;
-import users.UserData;
+package tests;
+
+import pojos.ColorsData;
+import pojos.UserData;
 import org.junit.Assert;
 import org.junit.Test;
-import registration.Register;
-import registration.SuccessReg;
-import registration.UnSuccessReg;
-import spec.Specifications;
+import pojos.Register;
+import pojos.SuccessReg;
+import pojos.UnSuccessReg;
+import core.Specifications;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 
-public class ReqresPojoTest {
+public class ReqresTest {
     private final static String URL = "https://reqres.in/";
 
+    /**
+     * 1. Get the list of users from the second page on https://reqres.in/
+     * 2. Make sure the users' id is contained in their avatar;
+     * 3. Make sure the users' email has the ending reqres.in;
+     */
     @Test
     public void checkAvatarAndIdTest(){
         Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpecOK200());
@@ -23,19 +30,23 @@ public class ReqresPojoTest {
                 .get("api/users?page=2")
                 .then().log().all()
                 .extract().body().jsonPath().getList("data",UserData.class);
-
+        //check the avatar contains an id
         users.forEach(x-> Assert.assertTrue(x.getAvatar().contains(x.getId().toString())));
-
+        //check mail ending in reqres.in
         Assert.assertTrue(users.stream().allMatch(x->x.getEmail().endsWith("@reqres.in")));
 
         List<String> avatars = users.stream().map(UserData::getAvatar).collect(Collectors.toList());
         List<String> ids = users.stream().map(x->x.getId().toString()).collect(Collectors.toList());
-
+        //check by comparing two lists
         for (int i = 0; i<avatars.size(); i++){
             Assert.assertTrue(avatars.get(i).contains(ids.get(i)));
         }
     }
 
+    /**
+     * 1. Using the service https://reqres.in/ to test the user's registration in the system
+     * 2. Test for successful registration
+     */
     @Test
     public void successRegTest(){
         Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpecOK200());
@@ -55,6 +66,10 @@ public class ReqresPojoTest {
         Assert.assertEquals(token, successReg.getToken());
     }
 
+    /**
+     * 1. Using the service https://reqres.in/ to test the user's registration in the system
+     * 2. Test for unsuccessful registration (password not entered)
+     */
     @Test
     public void unSuccessRegTest(){
         Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpecError400());
@@ -67,6 +82,10 @@ public class ReqresPojoTest {
         Assert.assertEquals("Missing password", unSuccessReg.getError());
     }
 
+    /**
+     * Using https://reqres.in/ make sure that LIST<RESOURCE> operation returns data,
+     * sorted by year
+     */
     @Test
     public void sortedYearsTest(){
         Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpecOK200());
@@ -82,6 +101,9 @@ public class ReqresPojoTest {
         System.out.println(sortedYears);
     }
 
+    /**
+     * Using the service https://reqres.in/ try to remove the second user and compare the status code
+     */
     @Test
     public void deleteUserTest(){
         Specifications.installSpecification(Specifications.requestSpec(URL), Specifications.responseSpecUnique(204));

@@ -1,4 +1,4 @@
-package users;
+package pojos;
 
 public class UserData {
     private Integer id;
